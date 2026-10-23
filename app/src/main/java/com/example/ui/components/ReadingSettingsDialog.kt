@@ -226,6 +226,13 @@ fun ReadingSettingsBottomSheet(
                         style = MaterialTheme.typography.bodySmall,
                         color = TranslationCharcoalText
                     )
+                    Spacer(modifier = Modifier.height(8.dp))
+                    Text(
+                        text = "• App ID: 28f10a08d\n• Ad Unit ID: c9y11av4i4h024pu",
+                        style = MaterialTheme.typography.labelMedium,
+                        fontWeight = FontWeight.SemiBold,
+                        color = SoftBluePrimary
+                    )
                 }
             }
         }

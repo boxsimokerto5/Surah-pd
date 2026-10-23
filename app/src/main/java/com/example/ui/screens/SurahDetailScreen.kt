@@ -123,6 +123,7 @@ fun SurahDetailScreen(
         modifier = modifier
             .fillMaxSize()
             .testTag("surah_detail_screen"),
+        contentWindowInsets = androidx.compose.foundation.layout.WindowInsets(0, 0, 0, 0),
         topBar = {
             TopAppBar(
                 title = {
@@ -209,7 +210,7 @@ fun SurahDetailScreen(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(innerPadding),
-            contentPadding = PaddingValues(horizontal = 16.dp, vertical = 12.dp)
+            contentPadding = PaddingValues(start = 16.dp, top = 12.dp, end = 16.dp, bottom = 140.dp)
         ) {
             // Surah Info & Keutamaan Expandable Card
             if (showSurahInfo) {

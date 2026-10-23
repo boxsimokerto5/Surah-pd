@@ -72,7 +72,7 @@ fun MurottalBottomPlayer(
             Surface(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(horizontal = 12.dp, vertical = 8.dp)
+                    .padding(start = 12.dp, end = 12.dp, top = 4.dp, bottom = 12.dp)
                     .shadow(12.dp, RoundedCornerShape(20.dp))
                     .clip(RoundedCornerShape(20.dp))
                     .border(

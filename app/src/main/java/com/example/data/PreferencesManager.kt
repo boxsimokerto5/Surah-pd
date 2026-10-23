@@ -114,6 +114,14 @@ class PreferencesManager(context: Context) {
         prefs.edit().putString(KEY_IRONSOURCE_APP_KEY, key.trim()).apply()
     }
 
+    fun getIronSourceAdUnitId(): String {
+        return prefs.getString(KEY_IRONSOURCE_AD_UNIT_ID, "") ?: ""
+    }
+
+    fun saveIronSourceAdUnitId(id: String) {
+        prefs.edit().putString(KEY_IRONSOURCE_AD_UNIT_ID, id.trim()).apply()
+    }
+
     companion object {
         private const val KEY_LAST_SURAH_NUM = "last_surah_num"
         private const val KEY_LAST_SURAH_NAME = "last_surah_name"
@@ -130,5 +138,6 @@ class PreferencesManager(context: Context) {
 
         private const val KEY_SURAH_OPEN_COUNTER = "surah_open_counter"
         private const val KEY_IRONSOURCE_APP_KEY = "ironsource_app_key"
+        private const val KEY_IRONSOURCE_AD_UNIT_ID = "ironsource_ad_unit_id"
     }
 }

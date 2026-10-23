@@ -25,8 +25,11 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AutoStories
 import androidx.compose.material.icons.filled.Bookmark
 import androidx.compose.material.icons.filled.Clear
+import androidx.compose.material.icons.filled.Info
 import androidx.compose.material.icons.filled.PlayArrow
 import androidx.compose.material.icons.filled.Search
+import androidx.compose.material.icons.filled.Security
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ElevatedCard
@@ -36,10 +39,14 @@ import androidx.compose.material3.FilterChipDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
+import androidx.compose.ui.graphics.vector.ImageVector
+import com.example.ui.components.AboutUsBottomSheet
+import com.example.ui.components.PrivacyPolicyBottomSheet
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -94,32 +101,41 @@ fun HomeScreen(
     onOpenDoaKhatam: () -> Unit,
     modifier: Modifier = Modifier
 ) {
-    LazyColumn(
+    var showAboutSheet by remember { mutableStateOf(false) }
+    var showPrivacySheet by remember { mutableStateOf(false) }
+
+    Column(
         modifier = modifier
             .fillMaxSize()
-            .testTag("home_screen_lazy_column"),
-        contentPadding = PaddingValues(bottom = 96.dp)
+            .testTag("home_screen_root")
     ) {
-        // Hero Islamic Header Banner with Soft Blue Morning Mosque Art
-        item {
-            IslamicHeroHeader(
-                onOpenDoaKhatam = onOpenDoaKhatam
-            )
-        }
+        // Hero Islamic Header Banner with Soft Blue Morning Mosque Art (tetap diam di tempat, tidak ikut naik turun)
+        IslamicHeroHeader(
+            onOpenDoaKhatam = onOpenDoaKhatam,
+            onOpenAboutUs = { showAboutSheet = true },
+            onOpenPrivacyPolicy = { showPrivacySheet = true }
+        )
 
-        // Penanda Terakhir Dibaca (Soft Blue Gradient Hero Card)
-        item {
-            LastReadHeroCard(
-                lastRead = lastRead,
-                onContinueReading = {
-                    if (lastRead != null) {
-                        onSurahSelected(lastRead.surahNumber, lastRead.ayahNumber)
-                    } else if (surahs.isNotEmpty()) {
-                        onSurahSelected(surahs.first().number, 1)
+        LazyColumn(
+            modifier = Modifier
+                .fillMaxWidth()
+                .weight(1f)
+                .testTag("home_screen_lazy_column"),
+            contentPadding = PaddingValues(top = 10.dp, bottom = 140.dp)
+        ) {
+            // Penanda Terakhir Dibaca (Soft Blue Gradient Hero Card)
+            item {
+                LastReadHeroCard(
+                    lastRead = lastRead,
+                    onContinueReading = {
+                        if (lastRead != null) {
+                            onSurahSelected(lastRead.surahNumber, lastRead.ayahNumber)
+                        } else if (surahs.isNotEmpty()) {
+                            onSurahSelected(surahs.first().number, 1)
+                        }
                     }
-                }
-            )
-        }
+                )
+            }
 
         // Search Bar & Filter Chips
         item {
@@ -321,17 +337,102 @@ fun HomeScreen(
                 )
             }
         }
+
+        // Footer Section: Tombol Tentang Kita & Privacy Policy
+        item {
+                Card(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = 16.dp, vertical = 14.dp),
+                    colors = CardDefaults.cardColors(containerColor = SoftBlueContainer),
+                    shape = RoundedCornerShape(16.dp)
+                ) {
+                    Column(
+                        modifier = Modifier.padding(16.dp),
+                        horizontalAlignment = Alignment.CenterHorizontally
+                    ) {
+                        Text(
+                            text = "Surat Pendek Al-Qur'an (Juz 30)",
+                            style = MaterialTheme.typography.titleSmall,
+                            fontWeight = FontWeight.Bold,
+                            color = ArabicMidnightText
+                        )
+                        Spacer(modifier = Modifier.height(2.dp))
+                        Text(
+                            text = "Versi 1.0 • Dikembangkan oleh Geccko Creator",
+                            style = MaterialTheme.typography.labelSmall,
+                            color = TranslationCharcoalText
+                        )
+                        Spacer(modifier = Modifier.height(12.dp))
+                        Row(
+                            modifier = Modifier.fillMaxWidth(),
+                            horizontalArrangement = Arrangement.spacedBy(8.dp)
+                        ) {
+                            OutlinedButton(
+                                onClick = { showAboutSheet = true },
+                                modifier = Modifier
+                                    .weight(1f)
+                                    .testTag("btn_footer_about_us"),
+                                shape = RoundedCornerShape(12.dp),
+                                colors = ButtonDefaults.outlinedButtonColors(
+                                    contentColor = SoftBluePrimary
+                                ),
+                                border = androidx.compose.foundation.BorderStroke(1.dp, SoftCardBorder)
+                            ) {
+                                Icon(
+                                    imageVector = Icons.Default.Info,
+                                    contentDescription = null,
+                                    modifier = Modifier.size(16.dp)
+                                )
+                                Spacer(modifier = Modifier.width(6.dp))
+                                Text("Tentang Kita", style = MaterialTheme.typography.labelMedium)
+                            }
+
+                            OutlinedButton(
+                                onClick = { showPrivacySheet = true },
+                                modifier = Modifier
+                                    .weight(1f)
+                                    .testTag("btn_footer_privacy_policy"),
+                                shape = RoundedCornerShape(12.dp),
+                                colors = ButtonDefaults.outlinedButtonColors(
+                                    contentColor = SoftBluePrimary
+                                ),
+                                border = androidx.compose.foundation.BorderStroke(1.dp, SoftCardBorder)
+                            ) {
+                                Icon(
+                                    imageVector = Icons.Default.Security,
+                                    contentDescription = null,
+                                    modifier = Modifier.size(16.dp)
+                                )
+                                Spacer(modifier = Modifier.width(6.dp))
+                                Text("Privacy Policy", style = MaterialTheme.typography.labelMedium)
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    // Pop-up Bottom Sheet gaya Google Maps (sudut kanan-kiri atas membulat 28dp)
+    if (showAboutSheet) {
+        AboutUsBottomSheet(onDismiss = { showAboutSheet = false })
+    }
+    if (showPrivacySheet) {
+        PrivacyPolicyBottomSheet(onDismiss = { showPrivacySheet = false })
     }
 }
 
 @Composable
 private fun IslamicHeroHeader(
-    onOpenDoaKhatam: () -> Unit
+    onOpenDoaKhatam: () -> Unit,
+    onOpenAboutUs: () -> Unit,
+    onOpenPrivacyPolicy: () -> Unit
 ) {
     Box(
         modifier = Modifier
             .fillMaxWidth()
-            .height(210.dp)
+            .height(205.dp)
     ) {
         // Soft blue morning mosque sunrise banner
         Image(
@@ -359,7 +460,7 @@ private fun IslamicHeroHeader(
         Column(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(horizontal = 20.dp, vertical = 18.dp),
+                .padding(horizontal = 18.dp, vertical = 16.dp),
             verticalArrangement = Arrangement.SpaceBetween
         ) {
             Row(
@@ -367,48 +468,48 @@ private fun IslamicHeroHeader(
                 horizontalArrangement = Arrangement.SpaceBetween,
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                Column {
+                Column(modifier = Modifier.weight(1f)) {
                     Text(
                         text = "بِسْمِ اللَّهِ الرَّحْمَٰنِ الرَّحِيمِ",
                         fontFamily = AmiriFontFamily,
-                        fontSize = 18.sp,
+                        fontSize = 17.sp,
                         color = Color.White
                     )
                     Text(
                         text = "Surat Pendek Al-Qur'an",
-                        style = MaterialTheme.typography.titleLarge,
+                        style = MaterialTheme.typography.titleMedium,
                         color = Color.White,
                         fontWeight = FontWeight.Bold
                     )
                 }
 
-                // Doa Khatam Button
-                Surface(
-                    modifier = Modifier
-                        .clip(CircleShape)
-                        .clickable { onOpenDoaKhatam() }
-                        .testTag("btn_doa_khatam"),
-                    color = Color.White.copy(alpha = 0.22f),
-                    contentColor = Color.White
+                Row(
+                    horizontalArrangement = Arrangement.spacedBy(5.dp),
+                    verticalAlignment = Alignment.CenterVertically
                 ) {
-                    Row(
-                        modifier = Modifier.padding(horizontal = 14.dp, vertical = 7.dp),
-                        verticalAlignment = Alignment.CenterVertically,
-                        horizontalArrangement = Arrangement.spacedBy(6.dp)
-                    ) {
-                        Icon(
-                            imageVector = Icons.Default.AutoStories,
-                            contentDescription = "Doa Khatam",
-                            modifier = Modifier.size(16.dp),
-                            tint = Color.White
-                        )
-                        Text(
-                            text = "Doa",
-                            style = MaterialTheme.typography.labelSmall,
-                            fontWeight = FontWeight.Bold,
-                            color = Color.White
-                        )
-                    }
+                    // Doa Khatam Button
+                    HeaderPillButton(
+                        icon = Icons.Default.AutoStories,
+                        label = "Doa",
+                        testTag = "btn_doa_khatam",
+                        onClick = onOpenDoaKhatam
+                    )
+
+                    // Tentang Kita Button
+                    HeaderPillButton(
+                        icon = Icons.Default.Info,
+                        label = "Tentang",
+                        testTag = "btn_about_us",
+                        onClick = onOpenAboutUs
+                    )
+
+                    // Privacy Policy Button
+                    HeaderPillButton(
+                        icon = Icons.Default.Security,
+                        label = "Privasi",
+                        testTag = "btn_privacy_policy",
+                        onClick = onOpenPrivacyPolicy
+                    )
                 }
             }
 
@@ -438,6 +539,42 @@ private fun IslamicHeroHeader(
                     )
                 }
             }
+        }
+    }
+}
+
+@Composable
+private fun HeaderPillButton(
+    icon: ImageVector,
+    label: String,
+    testTag: String,
+    onClick: () -> Unit
+) {
+    Surface(
+        modifier = Modifier
+            .clip(CircleShape)
+            .clickable(onClick = onClick)
+            .testTag(testTag),
+        color = Color.White.copy(alpha = 0.22f),
+        contentColor = Color.White
+    ) {
+        Row(
+            modifier = Modifier.padding(horizontal = 9.dp, vertical = 6.dp),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.spacedBy(4.dp)
+        ) {
+            Icon(
+                imageVector = icon,
+                contentDescription = label,
+                modifier = Modifier.size(14.dp),
+                tint = Color.White
+            )
+            Text(
+                text = label,
+                style = MaterialTheme.typography.labelSmall,
+                fontWeight = FontWeight.Bold,
+                color = Color.White
+            )
         }
     }
 }
