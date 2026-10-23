@@ -26,11 +26,26 @@ object IronSourceManager {
     private var onAdClosedCallback: (() -> Unit)? = null
     private var levelPlayInterstitialAd: LevelPlayInterstitialAd? = null
 
+    fun isEmulator(): Boolean {
+        return (android.os.Build.FINGERPRINT.startsWith("generic")
+                || android.os.Build.FINGERPRINT.startsWith("unknown")
+                || android.os.Build.MODEL.contains("google_sdk")
+                || android.os.Build.MODEL.contains("Emulator")
+                || android.os.Build.MODEL.contains("Android SDK built for x86")
+                || android.os.Build.BOARD == "QC_Reference_Phone"
+                || android.os.Build.MANUFACTURER.contains("Genymotion")
+                || android.os.Build.HOST.startsWith("Build")
+                || (android.os.Build.BRAND.startsWith("generic") && android.os.Build.DEVICE.startsWith("generic"))
+                || "google_sdk" == android.os.Build.PRODUCT
+                || android.os.Build.HARDWARE.contains("goldfish")
+                || android.os.Build.HARDWARE.contains("ranchu"))
+    }
+
     fun getActiveAppKey(preferencesManager: PreferencesManager): String {
         val prefKey = preferencesManager.getIronSourceAppKey()
         if (prefKey.isNotEmpty()) return prefKey
         val buildConfigKey = runCatching { BuildConfig.IRONSOURCE_APP_KEY }.getOrDefault("")
-        if (buildConfigKey.isNotEmpty()) return buildConfigKey
+        if (buildConfigKey.isNotEmpty() && buildConfigKey != "YOUR_IRONSOURCE_APP_KEY" && !buildConfigKey.startsWith("placeholder")) return buildConfigKey
         return DEFAULT_APP_KEY
     }
 
@@ -38,11 +53,16 @@ object IronSourceManager {
         val prefId = preferencesManager.getIronSourceAdUnitId()
         if (prefId.isNotEmpty()) return prefId
         val buildConfigId = runCatching { BuildConfig.IRONSOURCE_INTERSTITIAL_AD_UNIT_ID }.getOrDefault("")
-        if (buildConfigId.isNotEmpty()) return buildConfigId
+        if (buildConfigId.isNotEmpty() && buildConfigId != "YOUR_IRONSOURCE_AD_UNIT_ID" && !buildConfigId.startsWith("placeholder")) return buildConfigId
         return DEFAULT_INTERSTITIAL_AD_UNIT_ID
     }
 
     fun init(activity: Activity, preferencesManager: PreferencesManager) {
+        if (isEmulator()) {
+            Log.d(TAG, "Menjalankan di lingkungan emulator/preview. Menolak binding AdServices/IronSource untuk mencegah log onNullBinding.")
+            return
+        }
+
         val appKey = getActiveAppKey(preferencesManager)
         val adUnitId = getActiveAdUnitId(preferencesManager)
 
@@ -198,6 +218,7 @@ object IronSourceManager {
     }
 
     fun onResume(activity: Activity) {
+        if (!isInitialized) return
         try {
             IronSource.onResume(activity)
         } catch (e: Exception) {
@@ -206,6 +227,7 @@ object IronSourceManager {
     }
 
     fun onPause(activity: Activity) {
+        if (!isInitialized) return
         try {
             IronSource.onPause(activity)
         } catch (e: Exception) {

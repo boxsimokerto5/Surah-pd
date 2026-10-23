@@ -646,7 +646,7 @@ private fun LastReadHeroCard(
                     }
 
                     if (lastRead != null) {
-                        val dateFormat = SimpleDateFormat("dd MMM, HH:mm", Locale("id", "ID"))
+                        val dateFormat = SimpleDateFormat("dd MMM, HH:mm", Locale.forLanguageTag("id-ID"))
                         Text(
                             text = dateFormat.format(Date(lastRead.timestamp)),
                             style = MaterialTheme.typography.labelSmall,
