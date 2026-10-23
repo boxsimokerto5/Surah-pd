@@ -20,7 +20,7 @@ class ExampleRobolectricTest {
     fun `read string from context`() {
         val context = ApplicationProvider.getApplicationContext<Context>()
         val appName = context.getString(R.string.app_name)
-        assertEquals("Surat Pendek", appName)
+        assertEquals("Surat Pendek Al-Quran", appName)
     }
 
     @Test
@@ -66,5 +66,14 @@ class ExampleRobolectricTest {
 
         prefs.resetSurahOpenCount()
         assertEquals(0, prefs.getSurahOpenCount())
+    }
+
+    @Test
+    fun `verify splash screen transitions to home`() {
+        val app = ApplicationProvider.getApplicationContext<android.app.Application>()
+        val viewModel = com.example.ui.QuranViewModel(app)
+        assertEquals(com.example.ui.Screen.Splash, viewModel.currentScreen.value)
+        viewModel.onSplashFinished()
+        assertEquals(com.example.ui.Screen.Home, viewModel.currentScreen.value)
     }
 }

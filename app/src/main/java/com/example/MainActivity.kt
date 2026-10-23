@@ -29,6 +29,7 @@ import com.example.ui.Screen
 import com.example.ui.components.MurottalBottomPlayer
 import com.example.ui.screens.DoaKhatamScreen
 import com.example.ui.screens.HomeScreen
+import com.example.ui.screens.SplashScreen
 import com.example.ui.screens.SurahDetailScreen
 import com.example.ui.theme.MyApplicationTheme
 import kotlinx.coroutines.flow.collectLatest
@@ -81,18 +82,33 @@ fun QuranApp(viewModel: QuranViewModel) {
         }
     }
 
+    val isSplashScreen = currentScreen is Screen.Splash
+
     Scaffold(
         modifier = Modifier.fillMaxSize(),
-        contentWindowInsets = WindowInsets.safeDrawing,
+        contentWindowInsets = if (isSplashScreen) WindowInsets(0, 0, 0, 0) else WindowInsets.safeDrawing,
         snackbarHost = { SnackbarHost(hostState = snackbarHostState) }
     ) { innerPadding ->
         Box(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(innerPadding)
-                .padding(bottom = 8.dp)
+                .then(
+                    if (!isSplashScreen) {
+                        Modifier
+                            .padding(innerPadding)
+                            .padding(bottom = 8.dp)
+                    } else {
+                        Modifier
+                    }
+                )
         ) {
             when (val screen = currentScreen) {
+                is Screen.Splash -> {
+                    SplashScreen(
+                        onSplashFinished = viewModel::onSplashFinished
+                    )
+                }
+
                 is Screen.Home -> {
                     HomeScreen(
                         surahs = filteredSurahs,
@@ -175,31 +191,33 @@ fun QuranApp(viewModel: QuranViewModel) {
                 }
             }
 
-            // Bottom Floating Murottal Player
-            MurottalBottomPlayer(
-                playbackInfo = playbackInfo,
-                onTogglePlayPause = viewModel::toggleAudioPlayPause,
-                onPrevious = viewModel::playPreviousAyah,
-                onNext = viewModel::playNextAyah,
-                onStop = viewModel::stopAudio,
-                onPlayerClick = {
-                    playbackInfo?.let { info ->
-                        if (context != null) {
-                            viewModel.openSurah(context, info.surahNumber, info.ayahNumber)
-                        } else {
-                            viewModel.navigateTo(
-                                Screen.SurahDetail(
-                                    surahNumber = info.surahNumber,
-                                    targetAyahNumber = info.ayahNumber
+            // Bottom Floating Murottal Player (hidden on splash)
+            if (!isSplashScreen) {
+                MurottalBottomPlayer(
+                    playbackInfo = playbackInfo,
+                    onTogglePlayPause = viewModel::toggleAudioPlayPause,
+                    onPrevious = viewModel::playPreviousAyah,
+                    onNext = viewModel::playNextAyah,
+                    onStop = viewModel::stopAudio,
+                    onPlayerClick = {
+                        playbackInfo?.let { info ->
+                            if (context != null) {
+                                viewModel.openSurah(context, info.surahNumber, info.ayahNumber)
+                            } else {
+                                viewModel.navigateTo(
+                                    Screen.SurahDetail(
+                                        surahNumber = info.surahNumber,
+                                        targetAyahNumber = info.ayahNumber
+                                    )
                                 )
-                            )
+                            }
                         }
-                    }
-                },
-                modifier = Modifier
-                    .align(Alignment.BottomCenter)
-                    .padding(bottom = 6.dp)
-            )
+                    },
+                    modifier = Modifier
+                        .align(Alignment.BottomCenter)
+                        .padding(bottom = 6.dp)
+                )
+            }
         }
     }
 }

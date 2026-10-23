@@ -28,6 +28,7 @@ import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 
 sealed class Screen {
+    data object Splash : Screen()
     data object Home : Screen()
     data class SurahDetail(val surahNumber: Int, val targetAyahNumber: Int? = null) : Screen()
     data object DoaKhatam : Screen()
@@ -50,7 +51,7 @@ class QuranViewModel(application: Application) : AndroidViewModel(application) {
     val settings: StateFlow<ReadingSettings> = preferencesManager.settingsFlow
     val playbackInfo: StateFlow<AudioPlayingInfo?> = audioPlayer.playbackInfo
 
-    private val _currentScreen = MutableStateFlow<Screen>(Screen.Home)
+    private val _currentScreen = MutableStateFlow<Screen>(Screen.Splash)
     val currentScreen: StateFlow<Screen> = _currentScreen.asStateFlow()
 
     private val _searchQuery = MutableStateFlow("")
@@ -118,8 +119,14 @@ class QuranViewModel(application: Application) : AndroidViewModel(application) {
         }
     }
 
+    fun onSplashFinished() {
+        if (_currentScreen.value is Screen.Splash) {
+            _currentScreen.value = Screen.Home
+        }
+    }
+
     fun navigateBack(): Boolean {
-        if (_currentScreen.value !is Screen.Home) {
+        if (_currentScreen.value !is Screen.Home && _currentScreen.value !is Screen.Splash) {
             _currentScreen.value = Screen.Home
             return true
         }
