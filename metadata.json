@@ -1,0 +1,6 @@
+{
+  "name": "Surat Pendek Al-Quran",
+  "description": "Aplikasi Surat Pendek Al-Qur'an lengkap dengan audio murottal merdu, terjemahan bahasa Indonesia, nuansa kaligrafi Islami, dan penanda ayat terakhir dibaca.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
